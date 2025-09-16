@@ -1,11 +1,11 @@
 import type { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
-import dotenv from 'dotenv';
+import dotenvx from '@dotenvx/dotenvx';
 
 // PriceFeed Tasks
 import './tasks';
 
-dotenv.config();
+dotenvx.config();
 
 const config: HardhatUserConfig = {
   solidity: '0.8.28',

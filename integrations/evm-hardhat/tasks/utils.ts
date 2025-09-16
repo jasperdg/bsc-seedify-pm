@@ -1,10 +1,10 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import dotenv from 'dotenv';
+import dotenvx from '@dotenvx/dotenvx';
 import type { Network } from 'hardhat/types';
 import { networkConfigs, type SedaConfig } from '../seda.config';
 
-dotenv.config();
+dotenvx.config();
 
 /**
  * Helper function to fetch the deployed contract address from the deployment file.

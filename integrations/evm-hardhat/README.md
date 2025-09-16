@@ -29,7 +29,7 @@ This project follows the structure of a typical Hardhat project:
 
 ## Environment Variables
 
-Configure the .env file with the necessary variables. Here is an example .env file:
+Create a `.env` file in the project root with the necessary variables:
 
 ```
 ORACLE_PROGRAM_ID=YOUR_ORACLE_PROGRAM_ID
@@ -39,6 +39,8 @@ BASE_SEPOLIA_ETHERSCAN_API_KEY=YOUR_BASESCAN_API_KEY
 
 > [!CAUTION]
 > You must provide a valid EVM private key in your .env file to deploy and interact with contracts. Never share or commit your private key. Use a dedicated testing account with minimal funds.
+
+Alternatively, this project also supports `dotenvx` for environment variable management with built-in secret encryption. See the [dotenvx documentation](https://dotenvx.com) for usage details.
 
 ## Compiling and Testing the Contracts
 
