@@ -8,32 +8,40 @@
   SEDA Hardhat Integration
 </h1>
 
-This integration is built on a minimal Hardhat boilerplate, focusing on simplicity to showcase how to interact with the SEDA network. It features a sample consumer contract (PriceFeed) that interacts with the SEDA protocol through a Prover Contract, demonstrating how to create and retrieve data requests on the network.
+A TypeScript-based starter kit for connecting SEDA Oracle Programs to EVM-compatible blockchains using Hardhat. This integration features a **PriceFeed contract** that demonstrates how to create and retrieve data requests from the SEDA network.
 
-## Getting Started
+> [!IMPORTANT]
+> The **PriceFeed contract is an example** designed for educational purposes. It demonstrates basic SEDA integration patterns but should be modified for production use.
 
-Navigate to the `evm-hardhat` directory and install the dependencies:
+## Prerequisites
+
+Before using this integration, you must:s
+
+1. **Deploy an Oracle Program** to the SEDA network (see the [main README](../../README.md))
+2. **Get your Oracle Program ID** from the deployment
+3. **Set up your environment** with the required variables
+
+## Quick Start
+
+### 1. Install Dependencies
 
 ```sh
 cd integrations/evm-hardhat
 bun install
 ```
 
-### Project Structure
+### 2. Environment Setup
 
-This project follows the structure of a typical Hardhat project:
+Create a `.env` file with the required variables:
 
-- **contracts/**: Contains the Solidity contracts including PriceFeed.
-- **tasks/**: Hardhat tasks for interacting with the PriceFeed contract.
-- **test/**: Test files for the contracts.
-
-## Environment Variables
-
-Create a `.env` file in the project root with the necessary variables:
-
-```
+```bash
+# Required: Your deployed Oracle Program ID
 ORACLE_PROGRAM_ID=YOUR_ORACLE_PROGRAM_ID
+
+# Required: Your EVM private key for deployment
 EVM_PRIVATE_KEY=YOUR_EVM_PRIVATE_KEY
+
+# Optional: For contract verification
 BASE_SEPOLIA_ETHERSCAN_API_KEY=YOUR_BASESCAN_API_KEY
 ```
 
@@ -42,56 +50,96 @@ BASE_SEPOLIA_ETHERSCAN_API_KEY=YOUR_BASESCAN_API_KEY
 
 Alternatively, this project also supports `dotenvx` for environment variable management with built-in secret encryption. See the [dotenvx documentation](https://dotenvx.com) for usage details.
 
-## Compiling and Testing the Contracts
+### 3. Deploy the PriceFeed Contract
 
-Compile your contracts and run tests to ensure everything works correctly:
-
-```sh
-bun run compile
-bun run test
-```
-
-## Deploying the Contracts
-
-For your pricefeed you'll first need to build and deploy an Oracle Program to the SEDA network. In the root of this repository you'll find and example and the tools to create and deploy your own Oracle Programs. After deployment, you'll receive an ID that identifies your program on the network. This ID should be set in your `.env` file as `ORACLE_PROGRAM_ID`.
-
-Deploy the `PriceFeed` contract using dedicated Hardhat tasks:
+> [!IMPORTANT]
+> You must deploy the PriceFeed contract before you can create data requests. This is a destination contract that interacts with your deployed Oracle Program.
 
 ```sh
+# Deploy to Base Sepolia
 bunx hardhat pricefeed deploy --network baseSepolia --verify
+
+# Deploy with custom parameters
+bunx hardhat pricefeed deploy --oracle-program-id YOUR_ORACLE_PROGRAM_ID --core-address YOUR_CORE_ADDRESS --force
 ```
 
 To deploy to a specific network, use the `--network` flag followed by the network name (e.g. baseSepolia, goerli). You can also add the `--verify` flag to automatically verify the contract's source code on the network's block explorer after deployment.
 
-By default, the deployment uses environment variables defined in your `.env` file, but you can override these with command-line parameters:
-
-```sh
-bunx hardhat pricefeed deploy --oracle-program-id YOUR_ORACLE_PROGRAM_ID --core-address YOUR_CORE_ADDRESS --force
-```
+By default, the deployment uses environment variables defined in your `.env` file, but you can override these with command-line parameters.
 
 > [!NOTE]
 > The project includes a `seda.config.ts` file that contains SEDA-specific configurations including pre-configured core addresses for supported networks. You can modify this file to add support for additional networks or customize existing configurations.
 
-## Interacting with Deployed Contracts
+### 4. Interact with Your Contract
 
-Use Hardhat tasks specifically designed for interacting with the PriceFeed contract.
-
-**Transmit a Data Request**: Calls the transmit function on PriceFeed to trigger a data request post on the SEDA network.
-
+**Create a Data Request:**
 ```sh
 bunx hardhat pricefeed transmit --network baseSepolia
 ```
 
-**Fetch Latest Answer**: Calls the latestAnswer function on PriceFeed to get the result of the data request.
-
+**Fetch the Latest Result:**
 ```sh
 bunx hardhat pricefeed latest --network baseSepolia
 ```
 
-## Additional Resources
+## Project Structure
 
-- [**SEDA Protocol Documentation**](https://docs.seda.xyz): Learn more about how to build on the SEDA network and interact with data requests.
-- [**Hardhat Documentation**](https://hardhat.org/docs): Understand how to use Hardhat for developing, deploying, and testing your contracts.
+This project follows the structure of a typical Hardhat project:
+
+- **contracts/**: Contains the Solidity contracts including PriceFeed.
+- **tasks/**: Hardhat tasks for interacting with the PriceFeed contract.
+- **test/**: Test files for the contracts.
+- **seda.config.ts**: SEDA network configurations with deployed Core Addresses.
+
+## Understanding the Integration
+
+### Oracle Program vs Destination Contract
+
+- **Oracle Program** (Rust/WASM): Fetches data from external sources and processes it
+- **Destination Contract** (Solidity): Requests data from the Oracle Program and uses the results
+
+The PriceFeed contract is a **destination contract** that:
+1. Creates data requests on the SEDA network using your Oracle Program
+2. Retrieves processed results from the Oracle Program
+3. Makes the data available to other smart contracts
+
+### Example Flow
+
+1. **Deploy Oracle Program** → Get `ORACLE_PROGRAM_ID`
+2. **Deploy PriceFeed Contract** → Uses the `ORACLE_PROGRAM_ID`
+3. **Call `transmit()`** → Creates a data request on SEDA network
+4. **Call `latestAnswer()`** → Retrieves the processed result
+
+## Testing
+
+```sh
+# Compile contracts
+bun run compile
+
+# Run tests
+bun run test
+```
+
+## Development
+
+```sh
+# Format code
+bun run format
+
+# Lint code
+bun run lint
+```
+
+## Next Steps
+
+For advanced topics, different oracle programs, and customization ideas, see the [main integrations README](../README.md#whats-next).
+
+## Resources
+
+- [SEDA Protocol Documentation](https://docs.seda.xyz)
+- [Hardhat Documentation](https://hardhat.org/docs)
+- [Building Oracle Programs Guide](https://docs.seda.xyz/home/for-developers/building-an-oracle-program)
+- [SEDA SDK Documentation](https://github.com/sedaprotocol/seda-sdk)
 
 ## License
 
