@@ -1,0 +1,42 @@
+name: EVM Foundry
+
+on:
+  push:
+    branches: [main]
+    paths: ['integrations/evm-foundry/**']
+  pull_request:
+    branches: [main]
+    paths: ['integrations/evm-foundry/**']
+  workflow_dispatch:
+
+jobs:
+  evm-foundry-build-and-test:
+    name: EVM Foundry
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: integrations/evm-foundry
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Install dependencies
+        run: forge install
+
+      - name: Build contracts
+        run: forge build
+
+      - name: Run checks
+        run: |
+          forge fmt --check
+          forge lint
+
+      - name: Run tests
+        run: forge test -vvv

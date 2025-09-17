@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  op-build-and-test:
+    name: Oracle Program
     runs-on: ubuntu-latest
 
     steps:

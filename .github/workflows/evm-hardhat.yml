@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  evm-hardhat-build-and-test:
+    name: EVM Hardhat
     runs-on: ubuntu-latest
 
     defaults:

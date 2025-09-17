@@ -4,22 +4,22 @@ out = "out"
 libs = ["lib"]
 script = "script"
 remappings = [
-    "@seda-protocol/evm/=lib/seda-evm-contracts/",
-    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"
+    "forge-std/=lib/forge-std/src/",
+    "@seda-protocol/evm/=lib/seda-evm-contracts/"
 ]
 
 [fmt]
-  bracket_spacing = true
-  int_types = "long"
-  line_length = 120
-  multiline_func_header = "all"
-  number_underscore = "thousands"
-  quote_style = "double"
-  tab_width = 4
-  wrap_comments = true
+bracket_spacing = true
+int_types = "long"
+line_length = 120
+multiline_func_header = "all"
+number_underscore = "thousands"
+quote_style = "double"
+tab_width = 4
+wrap_comments = true
 
 [etherscan]
-  mainnet = { key = "${API_KEY_ETHERSCAN}" }
+mainnet = { key = "${API_KEY_ETHERSCAN}" }
 
 [rpc_endpoints]
 base = "https://mainnet.base.org"
