@@ -40,6 +40,10 @@ Create a `.env` file with the required variables:
 cp .env.example .env
 ```
 
+Set up your account to use for broadcasting transactions, check the [Foundry documentation](https://getfoundry.sh/guides/best-practices/key-management) for more best practices on how to manage your keys.
+
+In this README we will assume a wallet called "CAST_WALLET" has been imported into `cast` using the `cast wallet import --private-key 0x... CAST_WALLET` command.
+
 #### Required Variables
 
 | Variable | Description | Example |
@@ -52,7 +56,6 @@ cp .env.example .env
 |----------|-------------|---------|
 | `CORE_ADDRESS` | SEDA Core contract address | Deploy MockSedaCore |
 | `PRICEFEED_ADDRESS` | Deployed PriceFeed address | None |
-| `EVM_PRIVATE_KEY` | Private key for signing | Use mnemonic |
 | `REQUEST_FEE` | Request fee in wei | `0` |
 | `RESULT_FEE` | Result fee in wei | `0` |
 | `BATCH_FEE` | Batch fee in wei | `0` |
@@ -64,10 +67,10 @@ cp .env.example .env
 
 ```bash
 # Deploy to Base Sepolia
-forge script script/Deploy.s.sol:Deploy --rpc-url baseSepolia --broadcast --verify
+forge script script/Deploy.s.sol:Deploy --rpc-url baseSepolia --broadcast --verify --account CAST_WALLET --sender cast_wallet_address
 
 # Deploy with custom SEDA Core address
-CORE_ADDRESS=0x... forge script script/Deploy.s.sol:Deploy --rpc-url baseSepolia --broadcast
+CORE_ADDRESS=0x... forge script script/Deploy.s.sol:Deploy --rpc-url baseSepolia --broadcast --account CAST_WALLET --sender cast_wallet_address
 ```
 
 ### 4. Interact with Your Contract
@@ -75,10 +78,10 @@ CORE_ADDRESS=0x... forge script script/Deploy.s.sol:Deploy --rpc-url baseSepolia
 **Create a Data Request:**
 ```bash
 # Transmit with default fees
-PRICEFEED_ADDRESS=0x... forge script script/Transmit.s.sol:Transmit --rpc-url baseSepolia --broadcast
+PRICEFEED_ADDRESS=0x... forge script script/Transmit.s.sol:Transmit --rpc-url baseSepolia --broadcast --account CAST_WALLET --sender cast_wallet_address
 
 # Transmit with custom fees
-PRICEFEED_ADDRESS=0x... REQUEST_FEE=1000000000000000 RESULT_FEE=2000000000000000 BATCH_FEE=500000000000000 forge script script/Transmit.s.sol:Transmit --rpc-url baseSepolia --broadcast
+PRICEFEED_ADDRESS=0x... REQUEST_FEE=1000000000000000 RESULT_FEE=2000000000000000 BATCH_FEE=500000000000000 forge script script/Transmit.s.sol:Transmit --rpc-url baseSepolia --broadcast --account CAST_WALLET --sender cast_wallet_address
 ```
 
 **Fetch the Latest Result:**

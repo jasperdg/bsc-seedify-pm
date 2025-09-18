@@ -11,7 +11,6 @@ contract Deploy is BaseScript {
         // ENV:
         // - ORACLE_PROGRAM_ID (required): bytes32
         // - CORE_ADDRESS (optional): if set, use it; else deploy MockSedaCore
-        // - EVM_PRIVATE_KEY or MNEMONIC for transaction signing
 
         // Get Oracle Program ID (same for all networks)
         bytes32 opId = vm.envBytes32("ORACLE_PROGRAM_ID");
