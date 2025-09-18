@@ -53,7 +53,7 @@ fn median(mut nums: Vec<u128>) -> u128 {
     nums.sort();
     let middle = nums.len() / 2;
 
-    if nums.len() % 2 == 0 {
+    if nums.len().is_multiple_of(2) {
         return (nums[middle - 1] + nums[middle]) / 2;
     }
 

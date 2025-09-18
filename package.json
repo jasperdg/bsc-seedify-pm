@@ -7,7 +7,7 @@
     "build": "make build",
     "deploy": "bun run build && bunx seda-sdk oracle-program upload ./target/wasm32-wasip1/release-wasm/oracle-program.wasm",
     "post-dr": "bun run ./scripts/post-dr.ts",
-    "test": "bun run build && bun test"
+    "test": "bun test tests/ src/ --ignore='integrations/evm-foundry/lib/**'"
   },
   "keywords": [
     "seda",
