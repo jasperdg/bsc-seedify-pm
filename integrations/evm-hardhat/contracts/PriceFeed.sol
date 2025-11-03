@@ -54,7 +54,7 @@ contract PriceFeed {
             50000000000000, // execGasLimit (within uint64 range)
             20000000000000, // tallyGasLimit (within uint64 range)
             1, // replicationFactor (number of required DR executors)
-            bytes("eth-usdc"), // execInputs (Inputs for Execution WASM)
+            bytes("binancecoin"), // execInputs (Inputs for Execution WASM)
             hex"00", // tallyInputs
             hex"00", // consensusFilter (set to `None`)
             abi.encodePacked(block.number) // memo (Additional public info)

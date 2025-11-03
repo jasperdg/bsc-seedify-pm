@@ -142,6 +142,7 @@ priceFeedScope
       console.log(`\nDeployment information saved to ${deploymentFile}`);
       console.log(`Network key: ${networkKey}`);
 
+      await new Promise(resolve => setTimeout(resolve, 10000));
       // Verify contract if requested and not on local network
       if (verify && hre.network.name !== 'hardhat' && hre.network.name !== 'localhost') {
         console.log('\nVerifying contract on block explorer...');
