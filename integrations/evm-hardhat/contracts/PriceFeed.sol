@@ -4,7 +4,7 @@
  * It is for educational purposes only and should not be used in production.
  */
 
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {ISedaCore} from "@seda-protocol/evm/contracts/interfaces/ISedaCore.sol";
 import {SedaDataTypes} from "@seda-protocol/evm/contracts/libraries/SedaDataTypes.sol";
@@ -70,15 +70,15 @@ contract PriceFeed {
      * @dev Shows how to fetch and interpret SEDA request results
      * @return The price as uint128, or 0 if no consensus was reached
      */
-    function latestAnswer() public view returns (uint128) {
+    function latestAnswer() public view returns (uint128, uint64) {
         if (requestId == bytes32(0)) revert RequestNotTransmitted();
 
         SedaDataTypes.Result memory result = SEDA_CORE.getResult(requestId);
 
         if (result.consensus && result.exitCode == 0) {
-            return uint128(bytes16(result.result));
+            return (uint128(bytes16(result.result)), result.blockTimestamp);
         }
 
-        return 0;
+        return (0, 0);
     }
 }

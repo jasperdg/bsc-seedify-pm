@@ -10,34 +10,25 @@ dotenvx.config();
 const config: HardhatUserConfig = {
   solidity: '0.8.28',
   networks: {
-    base: {
+    bscTestnet: {
       accounts: process.env.EVM_PRIVATE_KEY ? [process.env.EVM_PRIVATE_KEY] : [],
-      url: 'https://mainnet.base.org',
-      chainId: 8453,
-    },
-    baseSepolia: {
-      accounts: process.env.EVM_PRIVATE_KEY ? [process.env.EVM_PRIVATE_KEY] : [],
-      url: 'https://sepolia.base.org',
-      chainId: 84532,
-    },
-    gnosisChiado: {
-      accounts: process.env.EVM_PRIVATE_KEY ? [process.env.EVM_PRIVATE_KEY] : [],
-      chainId: 10200,
-      url: 'https://rpc.chiadochain.net',
-    },
-    superseedSepolia: {
-      accounts: process.env.EVM_PRIVATE_KEY ? [process.env.EVM_PRIVATE_KEY] : [],
-      url: 'https://sepolia.superseed.xyz',
-      chainId: 53302,
-    },
-    hyperliquidPurrsec: {
-      accounts: process.env.EVM_PRIVATE_KEY ? [process.env.EVM_PRIVATE_KEY] : [],
-      chainId: 998,
-      url: 'https://rpc.hyperliquid-testnet.xyz/evm',
+      url: 'https://bnb-testnet.api.onfinality.io/public',
+      chainId: 97,
+
     },
   },
   etherscan: {
-    apiKey: process.env.BASE_SEPOLIA_ETHERSCAN_API_KEY || '',
+    apiKey: process.env.ETHERSCAN_API_KEY || '',
+    customChains: [
+      {
+        network: 'bscTestnet',
+        chainId: 97,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=97',
+          browserURL: 'https://testnet.bscscan.com',
+        },
+      },
+    ],
   },
 };
 
