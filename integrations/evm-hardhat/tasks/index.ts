@@ -7,4 +7,5 @@ export const priceFeedScope = scope('pricefeed', 'Interact with the PriceFeed co
 
 import './deploy';
 import './latest';
+import './settle';
 import './transmit';

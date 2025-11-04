@@ -8,10 +8,13 @@
   SEDA Hardhat Integration
 </h1>
 
-A TypeScript-based starter kit for connecting SEDA Oracle Programs to EVM-compatible blockchains using Hardhat. This integration features a **PriceFeed contract** that demonstrates how to create and retrieve data requests from the SEDA network.
+A TypeScript-based starter kit for connecting SEDA Oracle Programs to EVM-compatible blockchains using Hardhat. This integration features:
+
+- **PriceFeed contract**: Demonstrates how to create and retrieve data requests from the SEDA network
+- **MyMarket contract**: A prediction market that settles based on price data from PriceFeed after expiry
 
 > [!IMPORTANT]
-> The **PriceFeed contract is an example** designed for educational purposes. It demonstrates basic SEDA integration patterns but should be modified for production use.
+> The **contracts are examples** designed for educational purposes. They demonstrate basic SEDA integration patterns but should be modified for production use.
 
 ## Prerequisites
 
@@ -50,10 +53,10 @@ BASE_SEPOLIA_ETHERSCAN_API_KEY=YOUR_BASESCAN_API_KEY
 
 Alternatively, this project also supports `dotenvx` for environment variable management with built-in secret encryption. See the [dotenvx documentation](https://dotenvx.com) for usage details.
 
-### 3. Deploy the PriceFeed Contract
+### 3. Deploy the Contracts
 
 > [!IMPORTANT]
-> You must deploy the PriceFeed contract before you can create data requests. This is a destination contract that interacts with your deployed Oracle Program.
+> The deploy task deploys both PriceFeed and MyMarket contracts. PriceFeed is a destination contract that interacts with your deployed Oracle Program, and MyMarket is a prediction market that uses PriceFeed data for settlement.
 
 ```sh
 # Deploy to Base Sepolia
@@ -63,33 +66,42 @@ bunx hardhat pricefeed deploy --network baseSepolia --verify
 bunx hardhat pricefeed deploy --oracle-program-id YOUR_ORACLE_PROGRAM_ID --core-address YOUR_CORE_ADDRESS --force
 ```
 
-To deploy to a specific network, use the `--network` flag followed by the network name (e.g. baseSepolia, goerli). You can also add the `--verify` flag to automatically verify the contract's source code on the network's block explorer after deployment.
+To deploy to a specific network, use the `--network` flag followed by the network name (e.g. baseSepolia, bscTestnet). You can also add the `--verify` flag to automatically verify both contracts' source code on the network's block explorer after deployment.
 
-By default, the deployment uses environment variables defined in your `.env` file, but you can override these with command-line parameters.
+By default, the deployment uses environment variables defined in your `.env` file, but you can override these with command-line parameters. MyMarket constructor arguments (strike price and expiry) are hardcoded in `tasks/deploy.ts`.
 
 > [!NOTE]
 > The project includes a `seda.config.ts` file that contains SEDA-specific configurations including pre-configured core addresses for supported networks. You can modify this file to add support for additional networks or customize existing configurations.
 
-### 4. Interact with Your Contract
+### 4. Interact with Your Contracts
 
-**Create a Data Request:**
+**Create a Data Request (PriceFeed):**
 ```sh
 bunx hardhat pricefeed transmit --network baseSepolia
 ```
 
-**Fetch the Latest Result:**
+**Fetch the Latest Result (PriceFeed):**
 ```sh
 bunx hardhat pricefeed latest --network baseSepolia
 ```
+
+**Settle the Market (MyMarket):**
+```sh
+bunx hardhat pricefeed settle --network baseSepolia
+```
+
+> [!NOTE]
+> The settle task can only be executed after the MyMarket contract has expired. It fetches the latest price from PriceFeed and determines if the price settled above or below the strike price. The market can only be settled once.
 
 ## Project Structure
 
 This project follows the structure of a typical Hardhat project:
 
-- **contracts/**: Contains the Solidity contracts including PriceFeed.
-- **tasks/**: Hardhat tasks for interacting with the PriceFeed contract.
+- **contracts/**: Contains the Solidity contracts (PriceFeed and MyMarket).
+- **tasks/**: Hardhat tasks for interacting with the contracts (deploy, transmit, latest, settle).
 - **test/**: Test files for the contracts.
 - **seda.config.ts**: SEDA network configurations with deployed Core Addresses.
+- **deployments/**: JSON file containing deployed contract addresses per network.
 
 ## Understanding the Integration
 
@@ -106,9 +118,45 @@ The PriceFeed contract is a **destination contract** that:
 ### Example Flow
 
 1. **Deploy Oracle Program** → Get `ORACLE_PROGRAM_ID`
-2. **Deploy PriceFeed Contract** → Uses the `ORACLE_PROGRAM_ID`
+2. **Deploy Contracts** → Deploys PriceFeed (using `ORACLE_PROGRAM_ID`) and MyMarket (using PriceFeed address)
 3. **Call `transmit()`** → Creates a data request on SEDA network
 4. **Call `latestAnswer()`** → Retrieves the processed result
+5. **After expiry, call `settle()`** → Settles the market based on the latest price
+
+## MyMarket Contract
+
+The MyMarket contract demonstrates a practical use case for oracle data: a prediction market that automatically settles based on price data.
+
+### How It Works
+
+1. **Deployment**: MyMarket is deployed with:
+   - PriceFeed contract address
+   - Strike price (e.g., $500 BNB)
+   - Expiry time (e.g., 7 days from deployment)
+
+2. **Before Expiry**: The market waits for the expiry time
+   - Users can check if the market has expired with `hasExpired()`
+   - Users can check time remaining with `timeUntilExpiry()`
+
+3. **After Expiry**: Anyone can call `settleMarket()`:
+   - Fetches the latest price from PriceFeed
+   - Compares it against the strike price
+   - Records whether price settled above or below strike
+   - Validates that the price timestamp is after expiry
+   - Can only be settled once
+
+4. **Settlement Results**:
+   - `settlementPrice`: The price used for settlement
+   - `settledAboveStrike`: Boolean indicating if price > strike price
+   - `answerTimestamp`: When the price data was recorded
+   - `isSettled`: Whether the market has been settled
+
+### Key Features
+
+- **Timestamp Validation**: Ensures the price data is from after the expiry time
+- **One-Time Settlement**: Cannot be settled multiple times
+- **Transparent Results**: All settlement data is publicly accessible on-chain
+- **Configurable Parameters**: Strike price and expiry are set at deployment (hardcoded in `tasks/deploy.ts`)
 
 ## Testing
 
