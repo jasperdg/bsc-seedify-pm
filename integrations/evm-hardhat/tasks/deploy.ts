@@ -7,7 +7,7 @@ import { priceFeedScope } from '.';
 import { getOracleProgramId, getSedaConfig } from './utils';
 
 // MyMarket constructor arguments (hardcoded)
-const MY_MARKET_STRIKE_PRICE = 1000_000_000n; // 1000_000_000 BNB
+const MY_MARKET_STRIKE_PRICE = 1000_000_000n; // $1000_000_000 
 const MY_MARKET_EXPIRY_DAYS = 0; // expires now
 
 // Define a type for deployment info
@@ -154,7 +154,7 @@ priceFeedScope
       console.log('\n=== Deploying MyMarket ===');
       const myMarketExpiryTimestamp = Math.floor(Date.now() / 1000) + (MY_MARKET_EXPIRY_DAYS * 24 * 60 * 60);
       
-      console.log(`Strike Price: ${MY_MARKET_STRIKE_PRICE / BigInt(10 ** 6)} $BNB (${MY_MARKET_STRIKE_PRICE.toString()} wei)`);
+      console.log(`Strike Price: $${MY_MARKET_STRIKE_PRICE / BigInt(10 ** 6)} per bnb (${MY_MARKET_STRIKE_PRICE.toString()} wei)`);
       console.log(`Expiry: ${new Date(myMarketExpiryTimestamp * 1000).toUTCString()}`);
       
       const MyMarketFactory = await hre.ethers.getContractFactory('MyMarket');
