@@ -60,13 +60,13 @@ Alternatively, this project also supports `dotenvx` for environment variable man
 
 ```sh
 # Deploy to Base Sepolia
-bunx hardhat pricefeed deploy --network baseSepolia --verify
+bunx hardhat pricefeed deploy --network bscTestnet --verify
 
 # Deploy with custom parameters
 bunx hardhat pricefeed deploy --oracle-program-id YOUR_ORACLE_PROGRAM_ID --core-address YOUR_CORE_ADDRESS --force
 ```
 
-To deploy to a specific network, use the `--network` flag followed by the network name (e.g. baseSepolia, bscTestnet). You can also add the `--verify` flag to automatically verify both contracts' source code on the network's block explorer after deployment.
+To deploy to a specific network, use the `--network` flag followed by the network name (e.g. bscTestnet, bscTestnet). You can also add the `--verify` flag to automatically verify both contracts' source code on the network's block explorer after deployment.
 
 By default, the deployment uses environment variables defined in your `.env` file, but you can override these with command-line parameters. MyMarket constructor arguments (strike price and expiry) are hardcoded in `tasks/deploy.ts`.
 
@@ -77,17 +77,17 @@ By default, the deployment uses environment variables defined in your `.env` fil
 
 **Create a Data Request (PriceFeed):**
 ```sh
-bunx hardhat pricefeed transmit --network baseSepolia
+bunx hardhat pricefeed transmit --network bscTestnet
 ```
 
 **Fetch the Latest Result (PriceFeed):**
 ```sh
-bunx hardhat pricefeed latest --network baseSepolia
+bunx hardhat pricefeed latest --network bscTestnet
 ```
 
 **Settle the Market (MyMarket):**
 ```sh
-bunx hardhat pricefeed settle --network baseSepolia
+bunx hardhat pricefeed settle --network bscTestnet
 ```
 
 > [!NOTE]
