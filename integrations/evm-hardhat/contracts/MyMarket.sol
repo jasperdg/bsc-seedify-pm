@@ -64,9 +64,6 @@ contract MyMarket {
      * @param _expiryTime The Unix timestamp when the market expires
      */
     constructor(address _priceFeed, uint128 _strikePrice, uint256 _expiryTime) {
-        if (_expiryTime <= block.timestamp) {
-            revert ExpiryMustBeInFuture();
-        }
         if (_strikePrice == 0) {
             revert StrikePriceMustBePositive();
         }

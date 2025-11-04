@@ -6,6 +6,10 @@ import { type BytesLike, isAddress, isBytesLike } from 'ethers';
 import { priceFeedScope } from '.';
 import { getOracleProgramId, getSedaConfig } from './utils';
 
+// MyMarket constructor arguments (hardcoded)
+const MY_MARKET_STRIKE_PRICE = 1000_000_000n; // 1000_000_000 BNB
+const MY_MARKET_EXPIRY_DAYS = 0; // expires now
+
 // Define a type for deployment info
 interface DeploymentInfo {
   contractAddress: string;
@@ -13,19 +17,23 @@ interface DeploymentInfo {
   oracleProgramId: BytesLike;
   timestamp: number;
   deployer: string;
+  myMarketAddress?: string;
+  myMarketStrikePrice?: string;
+  myMarketExpiryTime?: number;
 }
 
 /**
- * Task: Deploys the PriceFeed contract.
+ * Task: Deploys the PriceFeed and MyMarket contracts.
  * Optional parameters:
  * - coreAddress: The SEDA Core contract address
  * - oracleProgramId: The Oracle program ID
  * - force: Force overwrite if deployment exists
- * - verify: Verify contract on the blockchain explorer
+ * - verify: Verify contracts on the blockchain explorer
  * If parameters are not provided, they are fetched from configuration.
+ * MyMarket strike price and expiry are hardcoded at the top of this file.
  */
 priceFeedScope
-  .task('deploy', 'Deploys the PriceFeed contract')
+  .task('deploy', 'Deploys the PriceFeed and MyMarket contracts')
   .addOptionalParam('coreAddress', 'The SEDA Core contract address')
   .addOptionalParam('oracleProgramId', 'The Oracle program ID')
   .addFlag('force', 'Force overwrite if deployment exists')
@@ -142,18 +150,58 @@ priceFeedScope
       console.log(`\nDeployment information saved to ${deploymentFile}`);
       console.log(`Network key: ${networkKey}`);
 
+      // Deploy MyMarket contract
+      console.log('\n=== Deploying MyMarket ===');
+      const myMarketExpiryTimestamp = Math.floor(Date.now() / 1000) + (MY_MARKET_EXPIRY_DAYS * 24 * 60 * 60);
+      
+      console.log(`Strike Price: ${MY_MARKET_STRIKE_PRICE / BigInt(10 ** 6)} $BNB (${MY_MARKET_STRIKE_PRICE.toString()} wei)`);
+      console.log(`Expiry: ${new Date(myMarketExpiryTimestamp * 1000).toUTCString()}`);
+      
+      const MyMarketFactory = await hre.ethers.getContractFactory('MyMarket');
+      const myMarket = await MyMarketFactory.deploy(
+        priceFeedAddress,
+        MY_MARKET_STRIKE_PRICE,
+        myMarketExpiryTimestamp
+      );
+      
+      await myMarket.waitForDeployment();
+      const myMarketAddress = await myMarket.getAddress();
+      
+      console.log('\nMyMarket deployed successfully:');
+      console.log(`- Contract Address: ${myMarketAddress}`);
+      console.log(`- PriceFeed: ${priceFeedAddress}`);
+      console.log(`- Strike Price: $${MY_MARKET_STRIKE_PRICE / BigInt(10 ** 6)}`);
+      console.log(`- Expiry: ${new Date(myMarketExpiryTimestamp * 1000).toUTCString()}`);
+      
+      // Update deployment info with MyMarket
+      allDeployments[networkKey].myMarketAddress = myMarketAddress;
+      allDeployments[networkKey].myMarketStrikePrice = (MY_MARKET_STRIKE_PRICE / BigInt(10 ** 6)).toString();
+      allDeployments[networkKey].myMarketExpiryTime = myMarketExpiryTimestamp;
+      fs.writeFileSync(deploymentFile, JSON.stringify(allDeployments, null, 2));
+
       await new Promise(resolve => setTimeout(resolve, 10000));
-      // Verify contract if requested and not on local network
+      // Verify contracts if requested and not on local network
       if (verify && hre.network.name !== 'hardhat' && hre.network.name !== 'localhost') {
-        console.log('\nVerifying contract on block explorer...');
+        console.log('\n=== Verifying PriceFeed ===');
         try {
           await hre.run('verify:verify', {
             address: priceFeedAddress,
             constructorArguments: [coreAddress, oracleProgramId],
           });
-          console.log('Contract verification successful');
+          console.log('PriceFeed verification successful');
         } catch (_error) {
-          console.warn('Contract verification failed');
+          console.warn('PriceFeed verification failed');
+        }
+
+        console.log('\n=== Verifying MyMarket ===');
+        try {
+          await hre.run('verify:verify', {
+            address: myMarketAddress,
+            constructorArguments: [priceFeedAddress, MY_MARKET_STRIKE_PRICE, myMarketExpiryTimestamp],
+          });
+          console.log('MyMarket verification successful');
+        } catch (_error) {
+          console.warn('MyMarket verification failed');
         }
       } else if (verify) {
         console.log('\nSkipping verification: Not available on local networks');
